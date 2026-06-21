@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 
 export default function Products() {
   const [visible, setVisible] = useState([]);
-  const [data , setData] = useState([]);
+  const [data, setData] = useState([]);
+
+
 
   useEffect(() => {
     async function getPosts() {
@@ -17,9 +19,35 @@ export default function Products() {
       setVisible(product.slice(0, 5));
       setData(product);
     }
-
     getPosts();
   }, []);
+
+
+
+
+  useEffect(() => {
+     if (data.length === 0 || visible.length >= data.length) return;
+
+    let loadmoore = document.getElementById("loadmoore");
+    if (!loadmoore) return;  
+
+    function ObserveHaneler(enteris) {
+      let entery = enteris[0];
+      if (entery.isIntersecting) {
+        setVisible((prev) => [
+          ...prev,
+          ...data.slice(prev.length, prev.length + 5),
+        ]);
+      }
+    }
+
+    const observer = new IntersectionObserver(ObserveHaneler, {
+      rootMargin: "100px",
+    });
+    observer.observe(loadmoore);
+
+     return () => observer.disconnect();
+  }, [data, visible]);  
 
   return (
     <div>
@@ -33,8 +61,7 @@ export default function Products() {
       </ul>
 
       <div id="loadmoore">
-
-        {visible.length<data.length ? "load moore..." : "load ended!"}
+        {visible.length < data.length ? "load moore..." : "load ended!"}
       </div>
     </div>
   );
